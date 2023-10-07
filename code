@@ -1,0 +1,33 @@
+import os
+import sys
+
+def log_illegal_characters_in_path(path, log_file_path, illegal_chars):
+	with open(log_file_path, 'w') as log_file:
+		for root, dirs, files in os.walk(path):
+			for name in dirs + files:
+				for char in illegal_chars:
+					if char in name:
+						char_description = (
+							"backslash" if char == "\\" else 
+							"colon (might appear as a forward slash in Finder)" if char == ":" else
+							char  # Other characters will just be named by themselves
+						)
+						log_entry = (
+							f"Illegal character found: {char} ({char_description})\n"
+							f"In: {os.path.join(root, name)}\n"
+							"---------------------------------\n"
+						)
+						log_file.write(log_entry)
+						print(log_entry)
+
+if __name__ == "__main__":
+	if len(sys.argv) != 2:
+		print("Usage: python3 script_name.py /path/to/check")
+		sys.exit(1)
+	
+	path_to_check = sys.argv[1]
+
+	# Prompt the user to input illegal characters
+	illegal_chars_input = input("Please enter illegal characters to search for, separated by a comma (,): ")
+	illegal_chars = [char.strip() for char in illegal_chars_input.split(',')]
+	log_illegal_characters_in_path(path_to_check, 'illegal_characters_log.txt', illegal_chars)
